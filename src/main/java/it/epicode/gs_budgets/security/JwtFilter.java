@@ -34,10 +34,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-       response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+//        response.setHeader("Access-Control-Allow-Origin", "*");
+//        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//        response.setHeader("Access-Control-Allow-Credentials", "true");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new UnauthorizedException("Error in authorization, token is null or Bearer is null");
@@ -52,6 +52,20 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
+
+        }
+
+    }
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return new AntPathMatcher().match("/auth/**", request.getServletPath());
+    }
+
+}
+
+
 //            try {
 //
 //            } catch (Exception e) {
@@ -67,14 +81,3 @@ public class JwtFilter extends OncePerRequestFilter {
 //                response.setStatus(errorResponse.getStatusCode().value());
 //                response.getWriter().write(errorResponse.getBody().toString());
 //            }
-        }
-
-    }
-
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return new AntPathMatcher().match("/auth/**", request.getServletPath());
-    }
-
-}
